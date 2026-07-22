@@ -17,7 +17,11 @@ if ($id === false || $id === null || $id < 1) {
 $pdo = require dirname(__DIR__) . '/src/database.php';
 
 $stmt = $pdo->prepare(
-    'SELECT id, title, description
+    'SELECT
+        id,
+        title,
+        description,
+        priority
      FROM tasks
      WHERE id = :id'
 );
@@ -42,6 +46,14 @@ function escape(string $value): string
         'UTF-8'
     );
 }
+
+$priority = match ((string) $task['priority']) {
+    'low' => 'low',
+    'high' => 'high',
+    default => 'medium',
+};
+
+$description = (string) ($task['description'] ?? '');
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +94,9 @@ function escape(string $value): string
                 name="title"
                 type="text"
                 maxlength="255"
-                value="<?= escape($task['title']) ?>"
+                value="<?= escape(
+                    (string) $task['title']
+                ) ?>"
                 required
             >
 
@@ -94,7 +108,43 @@ function escape(string $value): string
                 id="description"
                 name="description"
                 rows="5"
-            ><?= escape($task['description'] ?? '') ?></textarea>
+            ><?= escape($description) ?></textarea>
+
+            <label for="priority">
+                Приоритет
+            </label>
+
+            <select
+                id="priority"
+                name="priority"
+            >
+                <option
+                    value="low"
+                    <?= $priority === 'low'
+                        ? 'selected'
+                        : '' ?>
+                >
+                    Низкий
+                </option>
+
+                <option
+                    value="medium"
+                    <?= $priority === 'medium'
+                        ? 'selected'
+                        : '' ?>
+                >
+                    Средний
+                </option>
+
+                <option
+                    value="high"
+                    <?= $priority === 'high'
+                        ? 'selected'
+                        : '' ?>
+                >
+                    Высокий
+                </option>
+            </select>
 
             <div class="edit-actions">
                 <button type="submit">

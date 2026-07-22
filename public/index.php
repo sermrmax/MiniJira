@@ -44,6 +44,7 @@ $sql = '
         id,
         title,
         description,
+        priority,
         is_completed,
         created_at
     FROM tasks
@@ -80,6 +81,24 @@ function filterUrl(string $filter, string $search): string
     }
 
     return '/?' . http_build_query($parameters);
+}
+
+function normalizePriority(string $priority): string
+{
+    return match ($priority) {
+        'low' => 'low',
+        'high' => 'high',
+        default => 'medium',
+    };
+}
+
+function priorityLabel(string $priority): string
+{
+    return match (normalizePriority($priority)) {
+        'low' => 'Низкий',
+        'high' => 'Высокий',
+        default => 'Средний',
+    };
 }
 ?>
 
@@ -129,6 +148,30 @@ function filterUrl(string $filter, string $search): string
                 rows="4"
                 placeholder="Дополнительная информация"
             ></textarea>
+
+            <label for="priority">
+                Приоритет
+            </label>
+
+            <select
+                id="priority"
+                name="priority"
+            >
+                <option value="low">
+                    Низкий
+                </option>
+
+                <option
+                    value="medium"
+                    selected
+                >
+                    Средний
+                </option>
+
+                <option value="high">
+                    Высокий
+                </option>
+            </select>
 
             <button type="submit">
                 Добавить задачу
@@ -230,6 +273,13 @@ function filterUrl(string $filter, string $search): string
                         <?php
                             $isCompleted =
                                 (int) $task['is_completed'] === 1;
+
+                            $description =
+                                (string) ($task['description'] ?? '');
+
+                            $priority = normalizePriority(
+                                (string) $task['priority']
+                            );
                         ?>
 
                         <li
@@ -239,20 +289,32 @@ function filterUrl(string $filter, string $search): string
                         >
                             <div class="task-item__content">
                                 <h3>
-                                    <?= escape($task['title']) ?>
+                                    <?= escape(
+                                        (string) $task['title']
+                                    ) ?>
                                 </h3>
 
-                                <?php if ($task['description'] !== ''): ?>
+                                <?php if ($description !== ''): ?>
                                     <p>
-                                        <?= escape(
-                                            $task['description']
-                                        ) ?>
+                                        <?= escape($description) ?>
                                     </p>
                                 <?php endif; ?>
 
+                                <span
+                                    class="priority-badge priority-badge--<?= escape(
+                                        $priority
+                                    ) ?>"
+                                >
+                                    <?= escape(
+                                        priorityLabel($priority)
+                                    ) ?>
+                                </span>
+
                                 <time>
                                     Создано:
-                                    <?= escape($task['created_at']) ?>
+                                    <?= escape(
+                                        (string) $task['created_at']
+                                    ) ?>
                                 </time>
                             </div>
 

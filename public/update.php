@@ -16,6 +16,13 @@ $id = filter_input(
 
 $title = trim($_POST['title'] ?? '');
 $description = trim($_POST['description'] ?? '');
+$priority = $_POST['priority'] ?? 'medium';
+
+$allowedPriorities = [
+    'low',
+    'medium',
+    'high',
+];
 
 if ($id === false || $id === null || $id < 1) {
     http_response_code(422);
@@ -35,12 +42,19 @@ if (strlen($title) > 255) {
     exit('Название задачи слишком длинное.');
 }
 
+if (!in_array($priority, $allowedPriorities, true)) {
+    http_response_code(422);
+
+    exit('Некорректный приоритет задачи.');
+}
+
 $pdo = require dirname(__DIR__) . '/src/database.php';
 
 $stmt = $pdo->prepare(
     'UPDATE tasks
      SET title = :title,
-         description = :description
+         description = :description,
+         priority = :priority
      WHERE id = :id'
 );
 
@@ -48,6 +62,7 @@ $stmt->execute([
     'id' => $id,
     'title' => $title,
     'description' => $description,
+    'priority' => $priority,
 ]);
 
 header('Location: /');
