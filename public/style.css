@@ -169,3 +169,36 @@ h1 {
         flex-wrap: wrap;
     }
 }
+
+.edit-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 14px;
+    border: 1px solid #6b778c;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #44546f;
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    background: #f1f2f4;
+}
+
+.edit-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.cancel-link {
+    color: #44546f;
+    text-decoration: none;
+}
+
+.cancel-link:hover {
+    text-decoration: underline;
+}

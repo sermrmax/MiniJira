@@ -114,6 +114,13 @@ function escape(string $value): string
                             </div>
 
                             <div class="task-item__actions">
+                                <a
+                                    class="edit-button"
+                                    href="/edit.php?id=<?= (int) $task['id'] ?>"
+                                >
+                                    Изменить
+                                </a>
+
                                 <form
                                     action="/toggle.php"
                                     method="post"
