@@ -202,3 +202,50 @@ h1 {
 .cancel-link:hover {
     text-decoration: underline;
 }
+
+.tasks-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.tasks-header h2 {
+    margin: 0;
+}
+
+.task-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-link {
+    padding: 7px 12px;
+    border: 1px solid #dfe1e6;
+    border-radius: 6px;
+    color: #44546f;
+    text-decoration: none;
+}
+
+.filter-link:hover {
+    background: #f1f2f4;
+}
+
+.filter-link--active {
+    border-color: #0c66e4;
+    background: #0c66e4;
+    color: #ffffff;
+}
+
+.filter-link--active:hover {
+    background: #0055cc;
+}
+
+@media (max-width: 600px) {
+    .tasks-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

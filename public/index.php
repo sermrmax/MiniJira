@@ -4,11 +4,39 @@ declare(strict_types=1);
 
 $pdo = require dirname(__DIR__) . '/src/database.php';
 
-$stmt = $pdo->query(
-    'SELECT id, title, description, is_completed, created_at
-     FROM tasks
-     ORDER BY id DESC'
-);
+$filter = $_GET['filter'] ?? 'all';
+
+$allowedFilters = [
+    'all',
+    'active',
+    'completed',
+];
+
+if (!in_array($filter, $allowedFilters, true)) {
+    $filter = 'all';
+}
+
+$sql = '
+    SELECT
+        id,
+        title,
+        description,
+        is_completed,
+        created_at
+    FROM tasks
+';
+
+if ($filter === 'active') {
+    $sql .= ' WHERE is_completed = 0';
+}
+
+if ($filter === 'completed') {
+    $sql .= ' WHERE is_completed = 1';
+}
+
+$sql .= ' ORDER BY id DESC';
+
+$stmt = $pdo->query($sql);
 
 $tasks = $stmt->fetchAll();
 
@@ -75,11 +103,45 @@ function escape(string $value): string
         </form>
 
         <section class="tasks">
-            <h2>Мои задачи</h2>
+            <div class="tasks-header">
+                <h2>Мои задачи</h2>
+
+                <nav
+                    class="task-filters"
+                    aria-label="Фильтры задач"
+                >
+                    <a
+                        class="filter-link<?= $filter === 'all'
+                            ? ' filter-link--active'
+                            : '' ?>"
+                        href="/?filter=all"
+                    >
+                        Все
+                    </a>
+
+                    <a
+                        class="filter-link<?= $filter === 'active'
+                            ? ' filter-link--active'
+                            : '' ?>"
+                        href="/?filter=active"
+                    >
+                        Активные
+                    </a>
+
+                    <a
+                        class="filter-link<?= $filter === 'completed'
+                            ? ' filter-link--active'
+                            : '' ?>"
+                        href="/?filter=completed"
+                    >
+                        Выполненные
+                    </a>
+                </nav>
+            </div>
 
             <?php if ($tasks === []): ?>
                 <p class="empty-message">
-                    Задач пока нет.
+                    Задачи по выбранному фильтру не найдены.
                 </p>
             <?php else: ?>
                 <ul class="task-list">
