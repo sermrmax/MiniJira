@@ -5,6 +5,7 @@ declare(strict_types=1);
 $pdo = require dirname(__DIR__) . '/src/database.php';
 
 $filter = $_GET['filter'] ?? 'all';
+$search = trim($_GET['search'] ?? '');
 
 $allowedFilters = [
     'all',
@@ -14,6 +15,28 @@ $allowedFilters = [
 
 if (!in_array($filter, $allowedFilters, true)) {
     $filter = 'all';
+}
+
+$conditions = [];
+$params = [];
+
+if ($filter === 'active') {
+    $conditions[] = 'is_completed = 0';
+}
+
+if ($filter === 'completed') {
+    $conditions[] = 'is_completed = 1';
+}
+
+if ($search !== '') {
+    $conditions[] = '
+        (
+            title LIKE :search
+            OR description LIKE :search
+        )
+    ';
+
+    $params['search'] = '%' . $search . '%';
 }
 
 $sql = '
@@ -26,17 +49,14 @@ $sql = '
     FROM tasks
 ';
 
-if ($filter === 'active') {
-    $sql .= ' WHERE is_completed = 0';
-}
-
-if ($filter === 'completed') {
-    $sql .= ' WHERE is_completed = 1';
+if ($conditions !== []) {
+    $sql .= ' WHERE ' . implode(' AND ', $conditions);
 }
 
 $sql .= ' ORDER BY id DESC';
 
-$stmt = $pdo->query($sql);
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 
 $tasks = $stmt->fetchAll();
 
@@ -47,6 +67,19 @@ function escape(string $value): string
         ENT_QUOTES | ENT_SUBSTITUTE,
         'UTF-8'
     );
+}
+
+function filterUrl(string $filter, string $search): string
+{
+    $parameters = [
+        'filter' => $filter,
+    ];
+
+    if ($search !== '') {
+        $parameters['search'] = $search;
+    }
+
+    return '/?' . http_build_query($parameters);
 }
 ?>
 
@@ -114,7 +147,9 @@ function escape(string $value): string
                         class="filter-link<?= $filter === 'all'
                             ? ' filter-link--active'
                             : '' ?>"
-                        href="/?filter=all"
+                        href="<?= escape(
+                            filterUrl('all', $search)
+                        ) ?>"
                     >
                         Все
                     </a>
@@ -123,7 +158,9 @@ function escape(string $value): string
                         class="filter-link<?= $filter === 'active'
                             ? ' filter-link--active'
                             : '' ?>"
-                        href="/?filter=active"
+                        href="<?= escape(
+                            filterUrl('active', $search)
+                        ) ?>"
                     >
                         Активные
                     </a>
@@ -132,16 +169,60 @@ function escape(string $value): string
                         class="filter-link<?= $filter === 'completed'
                             ? ' filter-link--active'
                             : '' ?>"
-                        href="/?filter=completed"
+                        href="<?= escape(
+                            filterUrl('completed', $search)
+                        ) ?>"
                     >
                         Выполненные
                     </a>
                 </nav>
             </div>
 
+            <form
+                class="search-form"
+                action="/"
+                method="get"
+            >
+                <input
+                    type="hidden"
+                    name="filter"
+                    value="<?= escape($filter) ?>"
+                >
+
+                <label
+                    class="visually-hidden"
+                    for="search"
+                >
+                    Поиск задач
+                </label>
+
+                <input
+                    id="search"
+                    name="search"
+                    type="search"
+                    value="<?= escape($search) ?>"
+                    placeholder="Поиск по задачам"
+                >
+
+                <button type="submit">
+                    Найти
+                </button>
+
+                <?php if ($search !== ''): ?>
+                    <a
+                        class="clear-search"
+                        href="<?= escape(
+                            filterUrl($filter, '')
+                        ) ?>"
+                    >
+                        Сбросить
+                    </a>
+                <?php endif; ?>
+            </form>
+
             <?php if ($tasks === []): ?>
                 <p class="empty-message">
-                    Задачи по выбранному фильтру не найдены.
+                    Задачи не найдены.
                 </p>
             <?php else: ?>
                 <ul class="task-list">
