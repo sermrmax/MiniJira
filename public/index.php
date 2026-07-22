@@ -84,22 +84,54 @@ function escape(string $value): string
             <?php else: ?>
                 <ul class="task-list">
                     <?php foreach ($tasks as $task): ?>
-                        <li class="task-item">
-                            <div>
+                        <?php
+                            $isCompleted =
+                                (int) $task['is_completed'] === 1;
+                        ?>
+
+                        <li
+                            class="task-item<?= $isCompleted
+                                ? ' task-item--completed'
+                                : '' ?>"
+                        >
+                            <div class="task-item__content">
                                 <h3>
                                     <?= escape($task['title']) ?>
                                 </h3>
 
                                 <?php if ($task['description'] !== ''): ?>
                                     <p>
-                                        <?= escape($task['description']) ?>
+                                        <?= escape(
+                                            $task['description']
+                                        ) ?>
                                     </p>
                                 <?php endif; ?>
+
+                                <time>
+                                    Создано:
+                                    <?= escape($task['created_at']) ?>
+                                </time>
                             </div>
 
-                            <time>
-                                <?= escape($task['created_at']) ?>
-                            </time>
+                            <form
+                                action="/toggle.php"
+                                method="post"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="id"
+                                    value="<?= (int) $task['id'] ?>"
+                                >
+
+                                <button
+                                    class="toggle-button"
+                                    type="submit"
+                                >
+                                    <?= $isCompleted
+                                        ? 'Вернуть'
+                                        : 'Выполнено' ?>
+                                </button>
+                            </form>
                         </li>
                     <?php endforeach; ?>
                 </ul>

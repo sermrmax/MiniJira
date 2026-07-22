@@ -98,3 +98,39 @@ h1 {
 .empty-message {
     color: #6b778c;
 }
+
+.task-item__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-item__content time {
+    display: block;
+    margin-top: 12px;
+    color: #6b778c;
+    font-size: 13px;
+}
+
+.task-item--completed {
+    background: #f1f2f4;
+    opacity: 0.75;
+}
+
+.task-item--completed h3,
+.task-item--completed p {
+    text-decoration: line-through;
+}
+
+.toggle-button {
+    padding: 9px 14px;
+    border: 1px solid #0c66e4;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #0c66e4;
+    font: inherit;
+    cursor: pointer;
+}
+
+.toggle-button:hover {
+    background: #e9f2ff;
+}
