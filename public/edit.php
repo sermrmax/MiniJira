@@ -21,7 +21,8 @@ $stmt = $pdo->prepare(
         id,
         title,
         description,
-        priority
+        priority,
+        due_date
      FROM tasks
      WHERE id = :id'
 );
@@ -54,6 +55,7 @@ $priority = match ((string) $task['priority']) {
 };
 
 $description = (string) ($task['description'] ?? '');
+$dueDate = (string) ($task['due_date'] ?? '');
 ?>
 
 <!DOCTYPE html>
@@ -145,6 +147,17 @@ $description = (string) ($task['description'] ?? '');
                     Высокий
                 </option>
             </select>
+
+            <label for="due_date">
+                Срок выполнения
+            </label>
+
+            <input
+                id="due_date"
+                name="due_date"
+                type="date"
+                value="<?= escape($dueDate) ?>"
+            >
 
             <div class="edit-actions">
                 <button type="submit">

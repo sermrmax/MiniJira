@@ -177,6 +177,7 @@ h1 {
     padding: 16px;
     border: 1px solid #dfe1e6;
     border-radius: 8px;
+    background: #ffffff;
 }
 
 .task-item__content {
@@ -196,13 +197,6 @@ h1 {
     overflow-wrap: anywhere;
 }
 
-.task-item__content time {
-    display: block;
-    margin-top: 12px;
-    color: #6b778c;
-    font-size: 13px;
-}
-
 .task-item--completed {
     background: #f1f2f4;
     opacity: 0.75;
@@ -211,6 +205,59 @@ h1 {
 .task-item--completed h3,
 .task-item--completed p {
     text-decoration: line-through;
+}
+
+.task-item--overdue {
+    border-color: #c9372c;
+    box-shadow: 0 0 0 1px #c9372c;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.priority-badge {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.priority-badge--low {
+    background: #dcfff1;
+    color: #216e4e;
+}
+
+.priority-badge--medium {
+    background: #fff7d6;
+    color: #7f5f01;
+}
+
+.priority-badge--high {
+    background: #ffebe6;
+    color: #ae2e24;
+}
+
+.due-date {
+    color: #44546f;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.due-date--overdue {
+    color: #c9372c;
+}
+
+.created-date {
+    display: block;
+    margin-top: 12px;
+    color: #6b778c;
+    font-size: 13px;
 }
 
 .task-item__actions {
@@ -262,30 +309,6 @@ h1 {
 
 .delete-button:hover {
     background: #ffebe6;
-}
-
-.priority-badge {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 4px 9px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.priority-badge--low {
-    background: #dcfff1;
-    color: #216e4e;
-}
-
-.priority-badge--medium {
-    background: #fff7d6;
-    color: #7f5f01;
-}
-
-.priority-badge--high {
-    background: #ffebe6;
-    color: #ae2e24;
 }
 
 .edit-actions {
@@ -353,6 +376,16 @@ h1 {
     }
 
     .task-item__actions {
+        width: 100%;
+    }
+
+    .task-item__actions > * {
+        flex: 1;
+    }
+
+    .edit-button,
+    .toggle-button,
+    .delete-button {
         width: 100%;
     }
 }

@@ -11,6 +11,7 @@ $pdo->exec(
         title TEXT NOT NULL,
         description TEXT,
         priority TEXT NOT NULL DEFAULT 'medium',
+        due_date TEXT DEFAULT NULL,
         is_completed INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL
     )

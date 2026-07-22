@@ -45,6 +45,7 @@ $sql = '
         title,
         description,
         priority,
+        due_date,
         is_completed,
         created_at
     FROM tasks
@@ -60,6 +61,8 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 
 $tasks = $stmt->fetchAll();
+
+$today = date('Y-m-d');
 
 function escape(string $value): string
 {
@@ -99,6 +102,17 @@ function priorityLabel(string $priority): string
         'high' => 'Высокий',
         default => 'Средний',
     };
+}
+
+function formatDate(string $date): string
+{
+    $timestamp = strtotime($date);
+
+    if ($timestamp === false) {
+        return $date;
+    }
+
+    return date('d.m.Y', $timestamp);
 }
 ?>
 
@@ -173,6 +187,16 @@ function priorityLabel(string $priority): string
                 </option>
             </select>
 
+            <label for="due_date">
+                Срок выполнения
+            </label>
+
+            <input
+                id="due_date"
+                name="due_date"
+                type="date"
+            >
+
             <button type="submit">
                 Добавить задачу
             </button>
@@ -244,7 +268,7 @@ function priorityLabel(string $priority): string
                     name="search"
                     type="search"
                     value="<?= escape($search) ?>"
-                    placeholder="Поиск по задачам"
+                    placeholder="Поиск по названию и описанию"
                 >
 
                 <button type="submit">
@@ -274,19 +298,41 @@ function priorityLabel(string $priority): string
                             $isCompleted =
                                 (int) $task['is_completed'] === 1;
 
-                            $description =
-                                (string) ($task['description'] ?? '');
+                            $description = (string) (
+                                $task['description'] ?? ''
+                            );
 
                             $priority = normalizePriority(
                                 (string) $task['priority']
                             );
+
+                            $dueDate = (string) (
+                                $task['due_date'] ?? ''
+                            );
+
+                            $isOverdue =
+                                !$isCompleted
+                                && $dueDate !== ''
+                                && $dueDate < $today;
+
+                            $taskClasses = [
+                                'task-item',
+                            ];
+
+                            if ($isCompleted) {
+                                $taskClasses[] =
+                                    'task-item--completed';
+                            }
+
+                            if ($isOverdue) {
+                                $taskClasses[] =
+                                    'task-item--overdue';
+                            }
                         ?>
 
-                        <li
-                            class="task-item<?= $isCompleted
-                                ? ' task-item--completed'
-                                : '' ?>"
-                        >
+                        <li class="<?= escape(
+                            implode(' ', $taskClasses)
+                        ) ?>">
                             <div class="task-item__content">
                                 <h3>
                                     <?= escape(
@@ -300,17 +346,44 @@ function priorityLabel(string $priority): string
                                     </p>
                                 <?php endif; ?>
 
-                                <span
-                                    class="priority-badge priority-badge--<?= escape(
-                                        $priority
+                                <div class="task-meta">
+                                    <span
+                                        class="priority-badge priority-badge--<?= escape(
+                                            $priority
+                                        ) ?>"
+                                    >
+                                        <?= escape(
+                                            priorityLabel($priority)
+                                        ) ?>
+                                    </span>
+
+                                    <?php if ($dueDate !== ''): ?>
+                                        <time
+                                            class="due-date<?= $isOverdue
+                                                ? ' due-date--overdue'
+                                                : '' ?>"
+                                            datetime="<?= escape(
+                                                $dueDate
+                                            ) ?>"
+                                        >
+                                            Срок:
+                                            <?= escape(
+                                                formatDate($dueDate)
+                                            ) ?>
+
+                                            <?php if ($isOverdue): ?>
+                                                — просрочено
+                                            <?php endif; ?>
+                                        </time>
+                                    <?php endif; ?>
+                                </div>
+
+                                <time
+                                    class="created-date"
+                                    datetime="<?= escape(
+                                        (string) $task['created_at']
                                     ) ?>"
                                 >
-                                    <?= escape(
-                                        priorityLabel($priority)
-                                    ) ?>
-                                </span>
-
-                                <time>
                                     Создано:
                                     <?= escape(
                                         (string) $task['created_at']

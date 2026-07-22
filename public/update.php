@@ -2,6 +2,17 @@
 
 declare(strict_types=1);
 
+function isValidDate(string $value): bool
+{
+    $date = DateTimeImmutable::createFromFormat(
+        '!Y-m-d',
+        $value
+    );
+
+    return $date !== false
+        && $date->format('Y-m-d') === $value;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
 
@@ -17,6 +28,7 @@ $id = filter_input(
 $title = trim($_POST['title'] ?? '');
 $description = trim($_POST['description'] ?? '');
 $priority = $_POST['priority'] ?? 'medium';
+$dueDate = trim($_POST['due_date'] ?? '');
 
 $allowedPriorities = [
     'low',
@@ -48,13 +60,20 @@ if (!in_array($priority, $allowedPriorities, true)) {
     exit('Некорректный приоритет задачи.');
 }
 
+if ($dueDate !== '' && !isValidDate($dueDate)) {
+    http_response_code(422);
+
+    exit('Некорректная дата выполнения.');
+}
+
 $pdo = require dirname(__DIR__) . '/src/database.php';
 
 $stmt = $pdo->prepare(
     'UPDATE tasks
      SET title = :title,
          description = :description,
-         priority = :priority
+         priority = :priority,
+         due_date = :due_date
      WHERE id = :id'
 );
 
@@ -63,6 +82,7 @@ $stmt->execute([
     'title' => $title,
     'description' => $description,
     'priority' => $priority,
+    'due_date' => $dueDate !== '' ? $dueDate : null,
 ]);
 
 header('Location: /');
