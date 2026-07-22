@@ -134,3 +134,38 @@ h1 {
 .toggle-button:hover {
     background: #e9f2ff;
 }
+
+.task-item__actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 8px;
+}
+
+.task-item__actions form {
+    margin: 0;
+}
+
+.delete-button {
+    padding: 9px 14px;
+    border: 1px solid #c9372c;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #c9372c;
+    font: inherit;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background: #ffebe6;
+}
+
+@media (max-width: 600px) {
+    .task-item {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .task-item__actions {
+        flex-wrap: wrap;
+    }
+}

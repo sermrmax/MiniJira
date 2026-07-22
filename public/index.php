@@ -113,25 +113,45 @@ function escape(string $value): string
                                 </time>
                             </div>
 
-                            <form
-                                action="/toggle.php"
-                                method="post"
-                            >
-                                <input
-                                    type="hidden"
-                                    name="id"
-                                    value="<?= (int) $task['id'] ?>"
+                            <div class="task-item__actions">
+                                <form
+                                    action="/toggle.php"
+                                    method="post"
                                 >
+                                    <input
+                                        type="hidden"
+                                        name="id"
+                                        value="<?= (int) $task['id'] ?>"
+                                    >
 
-                                <button
-                                    class="toggle-button"
-                                    type="submit"
+                                    <button
+                                        class="toggle-button"
+                                        type="submit"
+                                    >
+                                        <?= $isCompleted
+                                            ? 'Вернуть'
+                                            : 'Выполнено' ?>
+                                    </button>
+                                </form>
+
+                                <form
+                                    action="/delete.php"
+                                    method="post"
                                 >
-                                    <?= $isCompleted
-                                        ? 'Вернуть'
-                                        : 'Выполнено' ?>
-                                </button>
-                            </form>
+                                    <input
+                                        type="hidden"
+                                        name="id"
+                                        value="<?= (int) $task['id'] ?>"
+                                    >
+
+                                    <button
+                                        class="delete-button"
+                                        type="submit"
+                                    >
+                                        Удалить
+                                    </button>
+                                </form>
+                            </div>
                         </li>
                     <?php endforeach; ?>
                 </ul>
